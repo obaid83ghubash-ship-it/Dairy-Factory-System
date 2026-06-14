@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام مصنع الألبان | Dairy Factory System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Segoe UI',Tahoma,Arial,sans-serif;background:#f5f5f0;color:#1a1a1a;direction:rtl}
+.topbar{background:#fff;border-bottom:1px solid #e0e0d8;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:#1D9E75;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px}
+.logo-text{font-size:16px;font-weight:600;color:#1a1a1a}
+.logo-sub{font-size:11px;color:#888}
+.lang-btn{font-size:12px;padding:5px 14px;border:1px solid #ccc;border-radius:8px;cursor:pointer;background:#f5f5f0;color:#333}
+.nav{display:flex;gap:2px;padding:8px 20px;background:#fff;border-bottom:1px solid #e0e0d8;overflow-x:auto}
+.nav-btn{padding:7px 14px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:13px;color:#666;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.nav-btn.active{background:#e1f5ee;color:#0F6E56;font-weight:600}
+.nav-btn:hover:not(.active){background:#f0f0ec}
+.content{padding:20px;max-width:1100px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.metric{background:#fff;border-radius:10px;padding:14px;border:1px solid #e8e8e0}
+.metric-label{font-size:12px;color:#888;margin-bottom:4px}
+.metric-val{font-size:24px;font-weight:600;color:#1D9E75}
+.card{background:#fff;border:1px solid #e8e8e0;border-radius:12px;padding:18px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:#555;font-weight:500}
+.field input,.field select,.field textarea{font-size:13px;padding:8px 11px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none;transition:border 0.2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#1D9E75}
+.field textarea{resize:vertical;min-height:65px}
+.btn-primary{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn-primary:hover{background:#0F6E56}
+.btn-secondary{background:#f5f5f0;border:1px solid #ccc;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer;color:#333}
+.btn-danger{background:#fff;border:1px solid #f09595;color:#A32D2D;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer}
+.btn-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:#e1f5ee;color:#0F6E56}
+.badge-warning{background:#faeeda;color:#854F0B}
+.badge-danger{background:#fcebeb;color:#A32D2D}
+.badge-info{background:#e6f1fb;color:#185FA5}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;padding:9px 10px;font-size:11px;font-weight:600;color:#888;border-bottom:1px solid #e8e8e0;background:#fafaf8}
+td{padding:10px 10px;border-bottom:1px solid #f0f0ec;color:#1a1a1a}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.page-title{font-size:20px;font-weight:700;color:#1a1a1a}
+.page-sub{font-size:13px;color:#888;margin-top:3px}
+.progress-bar{height:7px;background:#f0f0ec;border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:#1D9E75;border-radius:4px}
+.step-flow{display:flex;align-items:center;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;flex-wrap:wrap}
+.step-box{padding:7px 14px;font-size:12px;font-weight:600;border-radius:8px;border:1px solid #ddd;white-space:nowrap;background:#fff;color:#999}
+.step-box.done{background:#e1f5ee;color:#0F6E56;border-color:#5DCAA5}
+.step-box.active-step{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.step-arrow{font-size:14px;color:#bbb;margin:0 2px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:11px 22px;border-radius:10px;font-size:13px;display:none;z-index:999;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.form-row-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="app">
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-droplet"></i></div>
+    <div>
+      <div class="logo-text" id="logo-text">نظام مصنع الألبان</div>
+      <div class="logo-sub">Dairy Factory System</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:12px;color:#888" id="date-display"></span>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-toggle">English</button>
+  </div>
+</div>
+
+<div class="nav" id="main-nav">
+  <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard"><i class="ti ti-layout-dashboard"></i><span data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</span></button>
+  <button class="nav-btn" onclick="showPage('receiving')" id="nav-receiving"><i class="ti ti-truck"></i><span data-ar="استلام الحليب" data-en="Milk Receiving">استلام الحليب</span></button>
+  <button class="nav-btn" onclick="showPage('quality')" id="nav-quality"><i class="ti ti-microscope"></i><span data-ar="مراقبة الجودة" data-en="Quality Control">مراقبة الجودة</span></button>
+  <button class="nav-btn" onclick="showPage('processing')" id="nav-processing"><i class="ti ti-settings"></i><span data-ar="المعالجة" data-en="Processing">المعالجة</span></button>
+  <button class="nav-btn" onclick="showPage('packaging')" id="nav-packaging"><i class="ti ti-package"></i><span data-ar="التعبئة" data-en="Packaging">التعبئة</span></button>
+  <button class="nav-btn" onclick="showPage('inventory')" id="nav-inventory"><i class="ti ti-box"></i><span data-ar="المخزون" data-en="Inventory">المخزون</span></button>
+  <button class="nav-btn" onclick="showPage('sales')" id="nav-sales"><i class="ti ti-receipt"></i><span data-ar="المبيعات" data-en="Sales">المبيعات</span></button>
+  <button class="nav-btn" onclick="showPage('reports')" id="nav-reports"><i class="ti ti-chart-bar"></i><span data-ar="التقارير" data-en="Reports">التقارير</span></button>
+</div>
+
+<div class="content">
+<div class="toast" id="toast"></div>
+
+<!-- لوحة التحكم -->
+<div class="page active" id="page-dashboard">
+  <div class="section-head">
+    <div>
+      <div class="page-title" data-ar="لوحة التحكم" data-en="Dashboard">لوحة التحكم</div>
+      <div class="page-sub" data-ar="نظرة عامة على المصنع اليوم" data-en="Today's factory overview">نظرة عامة على المصنع اليوم</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label" data-ar="الحليب المستلم اليوم" data-en="Milk received today">الحليب المستلم اليوم</div><div class="metric-val" id="dm-received">0 لتر</div></div>
+    <div class="metric"><div class="metric-label" data-ar="الدفعات المعالجة" data-en="Batches processed">الدفعات المعالجة</div><div class="metric-val" id="dm-batches">0</div></div>
+    <div class="metric"><div class="metric-label" data-ar="الوحدات المعبأة" data-en="Units packaged">الوحدات المعبأة</div><div class="metric-val" id="dm-packaged">0</div></div>
+    <div class="metric"><div class="metric-label" data-ar="مبيعات اليوم" data-en="Sales today">مبيعات اليوم</div><div class="metric-val" id="dm-sales">0</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-truck"></i><span data-ar="آخر دفعات الحليب" data-en="Recent milk batches">آخر دفعات الحليب</span></div>
+      <div id="dash-batches-list" style="font-size:13px;color:#888">لا توجد دفعات بعد</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-alert-triangle"></i><span data-ar="تنبيهات الجودة" data-en="Quality alerts">تنبيهات الجودة</span></div>
+      <div id="dash-alerts" style="font-size:13px;color:#888">لا توجد تنبيهات</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-activity"></i><span data-ar="خط الإنتاج" data-en="Production pipeline">خط الإنتاج</span></div>
+    <div class="step-flow">
+      <div class="step-box" id="pipe-recv" data-ar="الاستلام" data-en="Receiving">الاستلام</div>
+      <div class="step-arrow">←</div>
+      <div class="step-box" id="pipe-qual" data-ar="الجودة" data-en="Quality">الجودة</div>
+      <div class="step-arrow">←</div>
+      <div class="step-box" id="pipe-proc" data-ar="المعالجة" data-en="Processing">المعالجة</div>
+      <div class="step-arrow">←</div>
+      <div class="step-box" id="pipe-pack" data-ar="التعبئة" data-en="Packaging">التعبئة</div>
+      <div class="step-arrow">←</div>
+      <div class="step-box" id="pipe-sale" data-ar="المبيعات" data-en="Sales">المبيعات</div>
+    </div>
+    <div style="font-size:12px;color:#888" id="pipe-status">ابدأ بتسجيل دفعات الحليب في قسم الاستلام.</div>
+  </div>
+</div>
+
+<!-- استلام الحليب -->
+<div class="page" id="page-receiving">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="استلام الحليب" data-en="Milk Receiving">استلام الحليب</div>
+    <div class="page-sub" data-ar="تسجيل الحليب الخام الوارد من الموردين" data-en="Register incoming raw milk">تسجيل الحليب الخام الوارد من الموردين</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-plus"></i><span data-ar="دفعة حليب جديدة" data-en="New milk batch">دفعة حليب جديدة</span></div>
+    <div class="form-row">
+      <div class="field"><label data-ar="اسم المورد" data-en="Supplier name">اسم المورد</label><input type="text" id="r-supplier" placeholder="مثال: مزرعة الروضة"></div>
+      <div class="field"><label data-ar="رقم السيارة / الخزان" data-en="Vehicle / Tank ID">رقم السيارة / الخزان</label><input type="text" id="r-vehicle" placeholder="مثال: TRK-001"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="الكمية (لتر)" data-en="Quantity (litres)">الكمية (لتر)</label><input type="number" id="r-qty" placeholder="0" min="0"></div>
+      <div class="field"><label data-ar="درجة الحرارة (°م)" data-en="Temperature (°C)">درجة الحرارة (°م)</label><input type="number" id="r-temp" placeholder="مثال: 4" step="0.1"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="وقت الوصول" data-en="Arrival time">وقت الوصول</label><input type="time" id="r-time"></div>
+      <div class="field"><label data-ar="اسم السائق" data-en="Driver name">اسم السائق</label><input type="text" id="r-driver" placeholder="اسم السائق"></div>
+    </div>
+    <div class="field" style="margin-bottom:12px"><label data-ar="ملاحظات" data-en="Notes">ملاحظات</label><textarea id="r-notes" placeholder="أي ملاحظات على الشحنة..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addBatch()"><i class="ti ti-check"></i><span data-ar="تسجيل الدفعة" data-en="Register batch">تسجيل الدفعة</span></button>
+      <button class="btn-secondary" onclick="clearReceiving()"><span data-ar="مسح" data-en="Clear">مسح</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list"></i><span data-ar="دفعات اليوم" data-en="Today's batches">دفعات اليوم</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="#" data-en="#">#</th>
+        <th data-ar="المورد" data-en="Supplier">المورد</th>
+        <th data-ar="الكمية (لتر)" data-en="Qty (L)">الكمية (لتر)</th>
+        <th data-ar="الحرارة" data-en="Temp">الحرارة</th>
+        <th data-ar="الوقت" data-en="Time">الوقت</th>
+        <th data-ar="الحالة" data-en="Status">الحالة</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="batches-tbody"><tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد دفعات مسجلة</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- مراقبة الجودة -->
+<div class="page" id="page-quality">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="مراقبة الجودة" data-en="Quality Control">مراقبة الجودة</div>
+    <div class="page-sub" data-ar="فحص وقبول أو رفض دفعات الحليب" data-en="Test and approve or reject batches">فحص وقبول أو رفض دفعات الحليب</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-microscope"></i><span data-ar="إدخال نتائج الفحص" data-en="Enter test results">إدخال نتائج الفحص</span></div>
+    <div class="form-row">
+      <div class="field"><label data-ar="اختر الدفعة" data-en="Select batch">اختر الدفعة</label><select id="q-batch"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label data-ar="نسبة الدهون (%)" data-en="Fat (%)">نسبة الدهون (%)</label><input type="number" id="q-fat" placeholder="مثال: 3.5" step="0.1"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="البروتين (%)" data-en="Protein (%)">البروتين (%)</label><input type="number" id="q-protein" placeholder="مثال: 3.2" step="0.1"></div>
+      <div class="field"><label data-ar="الحموضة (pH)" data-en="Acidity (pH)">الحموضة (pH)</label><input type="number" id="q-ph" placeholder="مثال: 6.7" step="0.1"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="عدد البكتيريا (CFU/mL)" data-en="Bacteria count">عدد البكتيريا (CFU/mL)</label><input type="number" id="q-bacteria" placeholder="مثال: 50000"></div>
+      <div class="field"><label data-ar="عدد الخلايا الجسدية" data-en="Somatic cell count">عدد الخلايا الجسدية</label><input type="number" id="q-somatic" placeholder="مثال: 200000"></div>
+    </div>
+    <div class="field" style="margin-bottom:12px"><label data-ar="ملاحظات المختبر" data-en="Lab notes">ملاحظات المختبر</label><textarea id="q-notes" placeholder="ملاحظات فني المختبر..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="approveQuality(true)"><i class="ti ti-check"></i><span data-ar="قبول الدفعة" data-en="Approve">قبول الدفعة</span></button>
+      <button class="btn-danger" onclick="approveQuality(false)"><i class="ti ti-x"></i><span data-ar="رفض الدفعة" data-en="Reject">رفض الدفعة</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-clipboard-list"></i><span data-ar="سجلات الجودة" data-en="Quality records">سجلات الجودة</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="الدفعة" data-en="Batch">الدفعة</th>
+        <th data-ar="المورد" data-en="Supplier">المورد</th>
+        <th data-ar="دهون%" data-en="Fat%">دهون%</th>
+        <th data-ar="بروتين%" data-en="Protein%">بروتين%</th>
+        <th data-ar="pH" data-en="pH">pH</th>
+        <th data-ar="النتيجة" data-en="Result">النتيجة</th>
+      </tr></thead>
+      <tbody id="quality-tbody"><tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا توجد سجلات جودة بعد</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- المعالجة -->
+<div class="page" id="page-processing">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="المعالجة" data-en="Processing">المعالجة</div>
+    <div class="page-sub" data-ar="البسترة والتجانس ودفعات الإنتاج" data-en="Pasteurization and production">البسترة والتجانس ودفعات الإنتاج</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-flame"></i><span data-ar="أمر إنتاج جديد" data-en="New processing order">أمر إنتاج جديد</span></div>
+    <div class="form-row">
+      <div class="field"><label data-ar="اختر الدفعة المعتمدة" data-en="Select approved batch">اختر الدفعة المعتمدة</label><select id="p-batch"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label data-ar="نوع المنتج" data-en="Product type">نوع المنتج</label>
+        <select id="p-type">
+          <option value="حليب كامل الدسم">حليب كامل الدسم</option>
+          <option value="حليب خالي الدسم">حليب خالي الدسم</option>
+          <option value="زبادي">زبادي</option>
+          <option value="جبن">جبن</option>
+          <option value="زبدة">زبدة</option>
+          <option value="قشطة">قشطة</option>
+          <option value="لبن">لبن</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="درجة البسترة (°م)" data-en="Pasteurization temp (°C)">درجة البسترة (°م)</label><input type="number" id="p-temp" value="72" step="0.1"></div>
+      <div class="field"><label data-ar="المدة (دقيقة)" data-en="Duration (min)">المدة (دقيقة)</label><input type="number" id="p-dur" value="15"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="الكمية الناتجة (لتر)" data-en="Output (L)">الكمية الناتجة (لتر)</label><input type="number" id="p-output" placeholder="0"></div>
+      <div class="field"><label data-ar="المشغّل" data-en="Operator">المشغّل</label><input type="text" id="p-operator" placeholder="اسم المشغّل"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addProcessing()"><i class="ti ti-player-play"></i><span data-ar="بدء المعالجة" data-en="Start processing">بدء المعالجة</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list"></i><span data-ar="سجل المعالجة" data-en="Processing log">سجل المعالجة</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="#" data-en="#">#</th>
+        <th data-ar="المنتج" data-en="Product">المنتج</th>
+        <th data-ar="من الدفعة" data-en="From batch">من الدفعة</th>
+        <th data-ar="الناتج" data-en="Output">الناتج</th>
+        <th data-ar="الحرارة / المدة" data-en="Temp / Time">الحرارة / المدة</th>
+        <th data-ar="المشغّل" data-en="Operator">المشغّل</th>
+        <th data-ar="الحالة" data-en="Status">الحالة</th>
+      </tr></thead>
+      <tbody id="processing-tbody"><tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد أوامر إنتاج بعد</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- التعبئة -->
+<div class="page" id="page-packaging">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="التعبئة والتغليف" data-en="Packaging">التعبئة والتغليف</div>
+    <div class="page-sub" data-ar="تعبئة المنتجات المعالجة في وحدات" data-en="Package processed products">تعبئة المنتجات المعالجة في وحدات</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-package"></i><span data-ar="تشغيل تعبئة جديد" data-en="New packaging run">تشغيل تعبئة جديد</span></div>
+    <div class="form-row">
+      <div class="field"><label data-ar="أمر المعالجة" data-en="Processing order">أمر المعالجة</label><select id="pk-order"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label data-ar="حجم العبوة" data-en="Package size">حجم العبوة</label>
+        <select id="pk-size">
+          <option value="200مل">200 مل</option>
+          <option value="500مل">500 مل</option>
+          <option value="1لتر">1 لتر</option>
+          <option value="2لتر">2 لتر</option>
+          <option value="5لتر">5 لتر</option>
+          <option value="250غ">250 غرام (صلب)</option>
+          <option value="500غ">500 غرام (صلب)</option>
+          <option value="1كغ">1 كيلو (صلب)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="الوحدات المنتجة" data-en="Units produced">الوحدات المنتجة</label><input type="number" id="pk-units" placeholder="0"></div>
+      <div class="field"><label data-ar="تاريخ الانتهاء" data-en="Expiry date">تاريخ الانتهاء</label><input type="date" id="pk-expiry"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="رمز الدفعة" data-en="Batch code">رمز الدفعة</label><input type="text" id="pk-code" placeholder="مثال: PKG-2024-001"></div>
+      <div class="field"><label data-ar="الخط / الآلة" data-en="Line / Machine">الخط / الآلة</label><input type="text" id="pk-line" placeholder="مثال: خط أ"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addPackaging()"><i class="ti ti-check"></i><span data-ar="تسجيل التعبئة" data-en="Record packaging">تسجيل التعبئة</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list"></i><span data-ar="سجلات التعبئة" data-en="Packaging records">سجلات التعبئة</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="الرمز" data-en="Code">الرمز</th>
+        <th data-ar="المنتج" data-en="Product">المنتج</th>
+        <th data-ar="الحجم" data-en="Size">الحجم</th>
+        <th data-ar="الوحدات" data-en="Units">الوحدات</th>
+        <th data-ar="الانتهاء" data-en="Expiry">الانتهاء</th>
+        <th data-ar="الخط" data-en="Line">الخط</th>
+      </tr></thead>
+      <tbody id="packaging-tbody"><tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا توجد عمليات تعبئة بعد</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- المخزون -->
+<div class="page" id="page-inventory">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="المخزون" data-en="Inventory">المخزون</div>
+    <div class="page-sub" data-ar="المخزون الحالي من المنتجات النهائية" data-en="Current finished products stock">المخزون الحالي من المنتجات النهائية</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-box"></i><span data-ar="مستويات المخزون" data-en="Stock levels">مستويات المخزون</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="المنتج" data-en="Product">المنتج</th>
+        <th data-ar="العبوة" data-en="Package">العبوة</th>
+        <th data-ar="في المخزون" data-en="In stock">في المخزون</th>
+        <th data-ar="رمز الدفعة" data-en="Batch code">رمز الدفعة</th>
+        <th data-ar="الانتهاء" data-en="Expiry">الانتهاء</th>
+        <th data-ar="الحالة" data-en="Status">الحالة</th>
+      </tr></thead>
+      <tbody id="inventory-tbody"><tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا يوجد مخزون — أكمل عملية تعبئة أولاً</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- المبيعات -->
+<div class="page" id="page-sales">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="المبيعات" data-en="Sales">المبيعات</div>
+    <div class="page-sub" data-ar="تسجيل أوامر البيع الصادرة" data-en="Record outgoing sales orders">تسجيل أوامر البيع الصادرة</div>
+  </div></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-shopping-cart"></i><span data-ar="أمر بيع جديد" data-en="New sale order">أمر بيع جديد</span></div>
+    <div class="form-row">
+      <div class="field"><label data-ar="اسم العميل" data-en="Customer name">اسم العميل</label><input type="text" id="s-customer" placeholder="اسم العميل أو الموزع"></div>
+      <div class="field"><label data-ar="اختر المنتج" data-en="Select product">اختر المنتج</label><select id="s-product"><option value="">-- اختر --</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="الكمية (وحدات)" data-en="Quantity (units)">الكمية (وحدات)</label><input type="number" id="s-qty" placeholder="0" min="1"></div>
+      <div class="field"><label data-ar="سعر الوحدة (درهم)" data-en="Unit price (AED)">سعر الوحدة (درهم)</label><input type="number" id="s-price" placeholder="0.00" step="0.01"></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label data-ar="تاريخ التسليم" data-en="Delivery date">تاريخ التسليم</label><input type="date" id="s-date"></div>
+      <div class="field"><label data-ar="طريقة الدفع" data-en="Payment method">طريقة الدفع</label>
+        <select id="s-payment">
+          <option value="نقد">نقد</option>
+          <option value="تحويل بنكي">تحويل بنكي</option>
+          <option value="آجل">آجل</option>
+          <option value="شيك">شيك</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addSale()"><i class="ti ti-receipt"></i><span data-ar="تسجيل البيع" data-en="Record sale">تسجيل البيع</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list"></i><span data-ar="سجلات المبيعات" data-en="Sales records">سجلات المبيعات</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th data-ar="#" data-en="#">#</th>
+        <th data-ar="العميل" data-en="Customer">العميل</th>
+        <th data-ar="المنتج" data-en="Product">المنتج</th>
+        <th data-ar="الكمية" data-en="Qty">الكمية</th>
+        <th data-ar="الإجمالي (درهم)" data-en="Total (AED)">الإجمالي (درهم)</th>
+        <th data-ar="الدفع" data-en="Payment">الدفع</th>
+        <th data-ar="التاريخ" data-en="Date">التاريخ</th>
+      </tr></thead>
+      <tbody id="sales-tbody"><tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد مبيعات مسجلة بعد</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- التقارير -->
+<div class="page" id="page-reports">
+  <div class="section-head"><div>
+    <div class="page-title" data-ar="التقارير" data-en="Reports">التقارير</div>
+    <div class="page-sub" data-ar="ملخص أداء المصنع" data-en="Factory performance summary">ملخص أداء المصنع</div>
+  </div></div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label" data-ar="إجمالي الحليب المستلم (لتر)" data-en="Total milk received (L)">إجمالي الحليب المستلم (لتر)</div><div class="metric-val" id="r-total-milk">0</div></div>
+    <div class="metric"><div class="metric-label" data-ar="معدل قبول الجودة" data-en="Quality approval rate">معدل قبول الجودة</div><div class="metric-val" id="r-approval">—</div></div>
+    <div class="metric"><div class="metric-label" data-ar="إجمالي الوحدات المعبأة" data-en="Total units packaged">إجمالي الوحدات المعبأة</div><div class="metric-val" id="r-units">0</div></div>
+    <div class="metric"><div class="metric-label" data-ar="إجمالي الإيرادات (درهم)" data-en="Total revenue (AED)">إجمالي الإيرادات (درهم)</div><div class="metric-val" id="r-revenue">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-bar"></i><span data-ar="توزيع المنتجات" data-en="Product breakdown">توزيع المنتجات</span></div>
+    <div id="product-breakdown" style="font-size:13px;color:#888">لا توجد بيانات بعد.</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-users"></i><span data-ar="أبرز الموردين" data-en="Top suppliers">أبرز الموردين</span></div>
+    <div id="supplier-breakdown" style="font-size:13px;color:#888">لا توجد بيانات بعد.</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+var lang='ar';
+var batches=[],qualityRecords=[],processingOrders=[],packagingRuns=[],inventory=[],salesOrders=[];
+var batchCounter=1,procCounter=1,saleCounter=1;
+
+function setDate(){
+  var d=new Date();
+  document.getElementById('date-display').textContent=d.toLocaleDateString('ar-AE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+setDate();
+
+function toggleLang(){
+  lang=lang==='ar'?'en':'ar';
+  document.documentElement.setAttribute('lang',lang);
+  document.body.style.direction=lang==='ar'?'rtl':'ltr';
+  document.getElementById('lang-toggle').textContent=lang==='ar'?'English':'العربية';
+  document.querySelectorAll('[data-ar]').forEach(function(el){
+    el.textContent=el.getAttribute('data-'+lang)||el.getAttribute('data-ar');
+  });
+  document.getElementById('date-display').textContent=new Date().toLocaleDateString(lang==='ar'?'ar-AE':'en-AE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='quality')refreshQBatch();
+  if(id==='processing')refreshPBatch();
+  if(id==='packaging')refreshPkOrder();
+  if(id==='sales')refreshSProduct();
+  if(id==='inventory')renderInventory();
+  if(id==='reports')renderReports();
+  if(id==='dashboard')renderDashboard();
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  setTimeout(function(){t.style.display='none'},2800);
+}
+
+function addBatch(){
+  var sup=document.getElementById('r-supplier').value.trim();
+  var veh=document.getElementById('r-vehicle').value.trim();
+  var qty=parseFloat(document.getElementById('r-qty').value);
+  var temp=parseFloat(document.getElementById('r-temp').value);
+  var time=document.getElementById('r-time').value;
+  var driver=document.getElementById('r-driver').value.trim();
+  var notes=document.getElementById('r-notes').value.trim();
+  if(!sup||!qty){showToast('يرجى إدخال اسم المورد والكمية');return;}
+  batches.push({id:batchCounter++,supplier:sup,vehicle:veh,qty:qty,temp:temp,time:time||'—',driver:driver,notes:notes,status:'pending'});
+  renderBatches();clearReceiving();
+  showToast('تم تسجيل الدفعة #'+(batchCounter-1)+' بنجاح');
+}
+
+function clearReceiving(){
+  ['r-supplier','r-vehicle','r-qty','r-temp','r-time','r-driver','r-notes'].forEach(function(id){document.getElementById(id).value='';});
+}
+
+function renderBatches(){
+  var tb=document.getElementById('batches-tbody');
+  if(!batches.length){tb.innerHTML='<tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد دفعات مسجلة</td></tr>';return;}
+  tb.innerHTML=batches.map(function(b){
+    var badge=b.status==='approved'?'<span class="badge badge-success">مقبولة</span>':b.status==='rejected'?'<span class="badge badge-danger">مرفوضة</span>':'<span class="badge badge-warning">قيد الفحص</span>';
+    return '<tr><td>#'+b.id+'</td><td>'+b.supplier+'</td><td>'+b.qty+'</td><td>'+(b.temp?b.temp+'°م':'—')+'</td><td>'+b.time+'</td><td>'+badge+'</td><td><button class="btn-danger" onclick="deleteBatch('+b.id+')">حذف</button></td></tr>';
+  }).join('');
+}
+
+function deleteBatch(id){
+  batches=batches.filter(function(b){return b.id!==id;});
+  renderBatches();
+}
+
+function refreshQBatch(){
+  var sel=document.getElementById('q-batch');
+  var pending=batches.filter(function(b){return b.status==='pending';});
+  sel.innerHTML='<option value="">-- اختر --</option>'+pending.map(function(b){return '<option value="'+b.id+'">#'+b.id+' - '+b.supplier+' ('+b.qty+' لتر)</option>';}).join('');
+}
+
+function approveQuality(approve){
+  var bId=parseInt(document.getElementById('q-batch').value);
+  if(!bId){showToast('يرجى اختيار دفعة أولاً');return;}
+  var fat=document.getElementById('q-fat').value;
+  var prot=document.getElementById('q-protein').value;
+  var ph=document.getElementById('q-ph').value;
+  var bact=document.getElementById('q-bacteria').value;
+  var som=document.getElementById('q-somatic').value;
+  var notes=document.getElementById('q-notes').value;
+  var batch=batches.find(function(b){return b.id===bId;});
+  batch.status=approve?'approved':'rejected';
+  qualityRecords.push({batchId:bId,supplier:batch.supplier,fat:fat,protein:prot,ph:ph,bacteria:bact,somatic:som,notes:notes,result:approve});
+  renderQuality();refreshQBatch();
+  showToast('الدفعة #'+bId+' تم '+(approve?'قبولها':'رفضها')+' بنجاح');
+  ['q-fat','q-protein','q-ph','q-bacteria','q-somatic','q-notes'].forEach(function(id){document.getElementById(id).value='';});
+}
+
+function renderQuality(){
+  var tb=document.getElementById('quality-tbody');
+  if(!qualityRecords.length){tb.innerHTML='<tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا توجد سجلات جودة بعد</td></tr>';return;}
+  tb.innerHTML=qualityRecords.map(function(q){
+    var badge=q.result?'<span class="badge badge-success">ناجحة</span>':'<span class="badge badge-danger">راسبة</span>';
+    return '<tr><td>#'+q.batchId+'</td><td>'+q.supplier+'</td><td>'+(q.fat||'—')+'</td><td>'+(q.protein||'—')+'</td><td>'+(q.ph||'—')+'</td><td>'+badge+'</td></tr>';
+  }).join('');
+}
+
+function refreshPBatch(){
+  var sel=document.getElementById('p-batch');
+  var approved=batches.filter(function(b){return b.status==='approved';});
+  sel.innerHTML='<option value="">-- اختر --</option>'+approved.map(function(b){return '<option value="'+b.id+'">#'+b.id+' - '+b.supplier+' ('+b.qty+' لتر)</option>';}).join('');
+}
+
+function addProcessing(){
+  var bId=parseInt(document.getElementById('p-batch').value);
+  if(!bId){showToast('يرجى اختيار دفعة مقبولة');return;}
+  var ptype=document.getElementById('p-type').value;
+  var temp=document.getElementById('p-temp').value;
+  var dur=document.getElementById('p-dur').value;
+  var output=parseFloat(document.getElementById('p-output').value);
+  var op=document.getElementById('p-operator').value.trim();
+  if(!output){showToast('يرجى إدخال الكمية الناتجة');return;}
+  var batch=batches.find(function(b){return b.id===bId;});
+  processingOrders.push({id:procCounter++,batchId:bId,supplier:batch.supplier,type:ptype,temp:temp,duration:dur,output:output,operator:op||'—',status:'مكتمل'});
+  renderProcessing();
+  showToast('تم بدء أمر الإنتاج #'+(procCounter-1));
+  ['p-output','p-operator'].forEach(function(id){document.getElementById(id).value='';});
+}
+
+function renderProcessing(){
+  var tb=document.getElementById('processing-tbody');
+  if(!processingOrders.length){tb.innerHTML='<tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد أوامر إنتاج بعد</td></tr>';return;}
+  tb.innerHTML=processingOrders.map(function(o){
+    return '<tr><td>#'+o.id+'</td><td>'+o.type+'</td><td>#'+o.batchId+'</td><td>'+o.output+' لتر</td><td>'+o.temp+'°م / '+o.duration+' دقيقة</td><td>'+o.operator+'</td><td><span class="badge badge-success">مكتمل</span></td></tr>';
+  }).join('');
+}
+
+function refreshPkOrder(){
+  var sel=document.getElementById('pk-order');
+  sel.innerHTML='<option value="">-- اختر --</option>'+processingOrders.map(function(o){return '<option value="'+o.id+'">#'+o.id+' - '+o.type+' ('+o.output+' لتر)</option>';}).join('');
+}
+
+function addPackaging(){
+  var oId=parseInt(document.getElementById('pk-order').value);
+  if(!oId){showToast('يرجى اختيار أمر معالجة');return;}
+  var size=document.getElementById('pk-size').value;
+  var units=parseInt(document.getElementById('pk-units').value);
+  var expiry=document.getElementById('pk-expiry').value;
+  var code=document.getElementById('pk-code').value.trim()||'PKG-'+Date.now();
+  var line=document.getElementById('pk-line').value.trim()||'—';
+  if(!units){showToast('يرجى إدخال عدد الوحدات المنتجة');return;}
+  var order=processingOrders.find(function(o){return o.id===oId;});
+  var run={code:code,product:order.type,size:size,units:units,expiry:expiry||'—',line:line,orderId:oId,remaining:units};
+  packagingRuns.push(run);
+  inventory.push(Object.assign({},run));
+  renderPackaging();renderInventory();
+  showToast('تم تسجيل '+units+' وحدة — أضيفت للمخزون');
+  ['pk-units','pk-expiry','pk-code','pk-line'].forEach(function(id){document.getElementById(id).value='';});
+}
+
+function renderPackaging(){
+  var tb=document.getElementById('packaging-tbody');
+  if(!packagingRuns.length){tb.innerHTML='<tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا توجد عمليات تعبئة بعد</td></tr>';return;}
+  tb.innerHTML=packagingRuns.map(function(r){
+    return '<tr><td>'+r.code+'</td><td>'+r.product+'</td><td>'+r.size+'</td><td>'+r.units+'</td><td>'+r.expiry+'</td><td>'+r.line+'</td></tr>';
+  }).join('');
+}
+
+function renderInventory(){
+  var tb=document.getElementById('inventory-tbody');
+  if(!inventory.length){tb.innerHTML='<tr><td colspan="6" style="color:#888;text-align:center;padding:20px">لا يوجد مخزون — أكمل عملية تعبئة أولاً</td></tr>';return;}
+  tb.innerHTML=inventory.map(function(i){
+    var st=i.remaining>0?'<span class="badge badge-success">متوفر</span>':'<span class="badge badge-danger">نفد المخزون</span>';
+    return '<tr><td>'+i.product+'</td><td>'+i.size+'</td><td>'+i.remaining+'</td><td>'+i.code+'</td><td>'+i.expiry+'</td><td>'+st+'</td></tr>';
+  }).join('');
+}
+
+function refreshSProduct(){
+  var sel=document.getElementById('s-product');
+  var instock=inventory.filter(function(i){return i.remaining>0;});
+  sel.innerHTML='<option value="">-- اختر --</option>'+instock.map(function(i,idx){return '<option value="'+idx+'">'+i.product+' ('+i.size+') — '+i.remaining+' وحدة</option>';}).join('');
+}
+
+function addSale(){
+  var customer=document.getElementById('s-customer').value.trim();
+  var pIdx=document.getElementById('s-product').value;
+  var qty=parseInt(document.getElementById('s-qty').value);
+  var price=parseFloat(document.getElementById('s-price').value);
+  var date=document.getElementById('s-date').value;
+  var payment=document.getElementById('s-payment').value;
+  if(!customer||pIdx===''||!qty||!price){showToast('يرجى ملء جميع الحقول المطلوبة');return;}
+  var invItem=inventory.filter(function(i){return i.remaining>0;})[parseInt(pIdx)];
+  if(!invItem){showToast('المنتج غير موجود');return;}
+  if(qty>invItem.remaining){showToast('الكمية غير كافية. المتوفر: '+invItem.remaining+' وحدة');return;}
+  invItem.remaining-=qty;
+  var total=qty*price;
+  salesOrders.push({id:saleCounter++,customer:customer,product:invItem.product+' '+invItem.size,qty:qty,price:price,total:total,payment:payment,date:date||new Date().toISOString().split('T')[0]});
+  renderSales();
+  showToast('تم تسجيل البيع #'+(saleCounter-1)+' — الإجمالي: '+total.toFixed(2)+' درهم');
+  ['s-customer','s-qty','s-price','s-date'].forEach(function(id){document.getElementById(id).value='';});
+  refreshSProduct();
+}
+
+function renderSales(){
+  var tb=document.getElementById('sales-tbody');
+  if(!salesOrders.length){tb.innerHTML='<tr><td colspan="7" style="color:#888;text-align:center;padding:20px">لا توجد مبيعات مسجلة بعد</td></tr>';return;}
+  tb.innerHTML=salesOrders.map(function(s){
+    return '<tr><td>#'+s.id+'</td><td>'+s.customer+'</td><td>'+s.product+'</td><td>'+s.qty+'</td><td>'+s.total.toFixed(2)+'</td><td>'+s.payment+'</td><td>'+s.date+'</td></tr>';
+  }).join('');
+}
+
+function renderReports(){
+  var totalMilk=batches.reduce(function(a,b){return a+b.qty;},0);
+  var approved=qualityRecords.filter(function(q){return q.result;}).length;
+  var totalQC=qualityRecords.length;
+  var approvalRate=totalQC?Math.round(approved/totalQC*100)+'%':'—';
+  var totalUnits=packagingRuns.reduce(function(a,b){return a+b.units;},0);
+  var totalRevenue=salesOrders.reduce(function(a,b){return a+b.total;},0);
+  document.getElementById('r-total-milk').textContent=totalMilk.toLocaleString('ar');
+  document.getElementById('r-approval').textContent=approvalRate;
+  document.getElementById('r-units').textContent=totalUnits.toLocaleString('ar');
+  document.getElementById('r-revenue').textContent=totalRevenue.toFixed(2)+' درهم';
+  var prodMap={};
+  packagingRuns.forEach(function(r){prodMap[r.product]=(prodMap[r.product]||0)+r.units;});
+  var pb=document.getElementById('product-breakdown');
+  var prods=Object.keys(prodMap);
+  if(!prods.length){pb.innerHTML='<span style="color:#888">لا توجد بيانات بعد.</span>';return;}
+  pb.innerHTML=prods.map(function(p){
+    var pct=totalUnits?Math.round(prodMap[p]/totalUnits*100):0;
+    return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>'+p+'</span><span style="color:#888">'+prodMap[p]+' وحدة ('+pct+'%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>';
+  }).join('');
+  var supMap={};
+  batches.forEach(function(b){supMap[b.supplier]=(supMap[b.supplier]||0)+b.qty;});
+  var sb=document.getElementById('supplier-breakdown');
+  var sups=Object.keys(supMap).sort(function(a,b){return supMap[b]-supMap[a];});
+  if(!sups.length){sb.innerHTML='<span style="color:#888">لا توجد بيانات بعد.</span>';return;}
+  sb.innerHTML=sups.map(function(s){
+    return '<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f0ec;font-size:13px"><span>'+s+'</span><span style="color:#888">'+supMap[s].toLocaleString('ar')+' لتر</span></div>';
+  }).join('');
+}
+
+function renderDashboard(){
+  var totalMilk=batches.reduce(function(a,b){return a+b.qty;},0);
+  document.getElementById('dm-received').textContent=totalMilk.toLocaleString('ar')+' لتر';
+  document.getElementById('dm-batches').textContent=processingOrders.length;
+  document.getElementById('dm-packaged').textContent=packagingRuns.reduce(function(a,b){return a+b.units;},0).toLocaleString('ar');
+  document.getElementById('dm-sales').textContent=salesOrders.length;
+  var bl=document.getElementById('dash-batches-list');
+  if(!batches.length){bl.innerHTML='<span style="color:#888;font-size:13px">لا توجد دفعات بعد</span>';}
+  else{bl.innerHTML=batches.slice(-4).reverse().map(function(b){var badge=b.status==='approved'?'badge-success':b.status==='rejected'?'badge-danger':'badge-warning';var statusAr=b.status==='approved'?'مقبولة':b.status==='rejected'?'مرفوضة':'قيد الفحص';return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0ec;font-size:13px"><span>#'+b.id+' — '+b.supplier+'</span><span class="badge '+badge+'">'+statusAr+'</span></div>';}).join('');}
+  var alerts=document.getElementById('dash-alerts');
+  var rejected=batches.filter(function(b){return b.status==='rejected';});
+  var expiring=inventory.filter(function(i){if(!i.expiry||i.expiry==='—')return false;var d=new Date(i.expiry);var now=new Date();var diff=(d-now)/86400000;return diff>=0&&diff<=3;});
+  var alertHtml='';
+  rejected.forEach(function(b){alertHtml+='<div style="padding:7px 0;border-bottom:1px solid #f0f0ec;font-size:13px;color:#A32D2D"><i class="ti ti-x"></i> الدفعة #'+b.id+' ('+b.supplier+') مرفوضة</div>';});
+  expiring.forEach(function(i){alertHtml+='<div style="padding:7px 0;border-bottom:1px solid #f0f0ec;font-size:13px;color:#854F0B"><i class="ti ti-alert-triangle"></i> '+i.product+' ينتهي '+i.expiry+'</div>';});
+  alerts.innerHTML=alertHtml||'<span style="color:#888;font-size:13px">لا توجد تنبيهات</span>';
+  var hasB=batches.length>0,hasQ=qualityRecords.length>0,hasP=processingOrders.length>0,hasPk=packagingRuns.length>0,hasS=salesOrders.length>0;
+  document.getElementById('pipe-recv').className='step-box '+(hasB?'done':'');
+  document.getElementById('pipe-qual').className='step-box '+(hasQ?'done':'');
+  document.getElementById('pipe-proc').className='step-box '+(hasP?'done':'');
+  document.getElementById('pipe-pack').className='step-box '+(hasPk?'done':'');
+  document.getElementById('pipe-sale').className='step-box '+(hasS?'done':'');
+  var done=[hasB,hasQ,hasP,hasPk,hasS].filter(Boolean).length;
+  var msgs=['ابدأ بتسجيل دفعات الحليب في قسم الاستلام.','قم بفحص الجودة للدفعات المستلمة.','حوّل الدفعات المقبولة إلى منتجات في قسم المعالجة.','عبّئ المنتجات المعالجة في وحدات.','سجّل المبيعات من المخزون.','جميع مراحل خط الإنتاج مكتملة!'];
+  document.getElementById('pipe-status').textContent=msgs[done];
+}
+
+renderDashboard();
+</script>
+</body>
+</html>
